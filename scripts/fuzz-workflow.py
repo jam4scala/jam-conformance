@@ -98,7 +98,7 @@ def parse_command_line_args():
         help="Comma separated list of targets to fuzz.",
     )
     parser.add_argument(
-        "-p", "--profile", type=str, default="fuzzy", help="Fuzzing profile to use"
+        "-p", "--profile", type=str, default="full", help="Fuzzing profile to use"
     )
     parser.add_argument(
         "--fuzzy-profile", type=str, default="rand", help="Fuzzy service profile to use"
@@ -212,6 +212,20 @@ def parse_command_line_args():
     )
 
     parser.add_argument(
+        "--safrole",
+        action="store_true",
+        default=None,
+        help="Enable safrole (overrides JAM_FUZZ_SAFROLE env var)",
+    )
+
+    parser.add_argument(
+        "--skip-slots",
+        action="store_true",
+        default=None,
+        help="Enable skip-slots (overrides JAM_FUZZ_SKIP_SLOTS env var)",
+    )
+
+    parser.add_argument(
         "--list-targets",
         action="store_true",
         help="List all available targets and exit",
@@ -299,6 +313,9 @@ def run_fuzzer_local_mode(args, log_file):
     else:
         seed = SEED
 
+    safrole = "true" if args.safrole else SAFROLE
+    skip_slots = "true" if args.skip_slots else SKIP_SLOTS
+
     fuzzer_args = [
         "--source",
         args.source,
@@ -307,9 +324,9 @@ def run_fuzzer_local_mode(args, log_file):
         "--step-period",
         STEP_PERIOD,
         "--safrole",
-        SAFROLE,
+        safrole,
         "--skip-slots",
-        SKIP_SLOTS,
+        skip_slots,
         "--seed",
         seed,
         "--max-work-items",
